@@ -17,6 +17,7 @@ def dataMerge(strTime):
     starttime = datetime.datetime.now()
     currentday = datetime.datetime.strptime(strTime, '%Y-%m-%d')
     yesterday_strTime=(currentday - datetime.timedelta(days = 1)).strftime("%Y-%m-%d") 
+    '''
     if (currentday.weekday()>0):
         daybefore= currentday - datetime.timedelta(days = 1)    
     else:
@@ -26,6 +27,9 @@ def dataMerge(strTime):
         daybefore1=daybefore - datetime.timedelta(days = 3)
     else:
         daybefore1=daybefore - datetime.timedelta(days = 1)
+    '''
+    daybefore= currentday - datetime.timedelta(days = 1) 
+    daybefore1=daybefore - datetime.timedelta(days = 1)
     daybefore_strTime = daybefore.strftime("%Y-%m-%d") 
     daybefore1_strTime = daybefore1.strftime("%Y-%m-%d") 
     today_path = os.path.join('output',strTime)
@@ -182,15 +186,15 @@ def dataMerge(strTime):
     duringtime = endtime -  starttime
     starttime = endtime
     print("read 服开数据更新"+daybefore1_strTime[5:]+'.csv for' +str(duringtime.seconds)+'seconds')
-    df1=pd.read_csv(os.path.join(today_path,"家客工单导出_佛山(" + strTime + ").csv"),engine='python',dtype=dtype)#,encoding='utf-8_sig')
+    df1=pd.read_csv(os.path.join(today_path,"家客工单导出_佛山(" + strTime + ").csv"),engine='python',dtype=dtype)#,ncoding='utf-8_sig')
 
 
 
-
-    df1['工单号']=df1['工单号'].map(lambda x: str(x[1:]))
+   #明天注释掉
+    #df1['工单号']=df1['工单号'].map(lambda x: str(x[1:]))
     #dfa['工单号']=dfa['工单号'].map(lambda x: "'" + str(x))
     df1.insert(17,'区域','')
-    df1.insert(17,'代维','')
+    df1.insert(18,'代维','')
     df1.insert(27,'归档时长','')
     df1.insert(36,'预约时长（IVR）','')
     df1.insert(36,'预约时长（旧）','')
@@ -237,7 +241,7 @@ def dataMerge(strTime):
         5、[资源类型]：自建宽带、空白
         6、筛选完后保存一份，命名为服开数据更新-×××
     '''
-    dfa=dfa[dfa['操作类型'].isin(['业务拆除','业务开通','业务移机','预勘查'])&(dfa['是否施工标识']=='普通开通施工')&((dfa['资源类型'].isin(['自建宽带','第三方（客服服务）']))|dfa['资源类型'].isnull())]
+    dfa=dfa[dfa['操作类型'].isin(['业务拆除','业务开通','业务移机','预勘查'])&(dfa['是否施工标识']=='普通开通施工')&(dfa['地市']=='佛山')&((dfa['资源类型'].isin(['自建宽带','第三方（客服服务）']))|dfa['资源类型'].isnull())]
     #dfa.to_excel(writer,sheet_name='afterfilter')
     #dfa.to_csv(today_path + "服开数据更新"+strTime[5:]+".csv",encoding='utf-8_sig')
 
@@ -246,7 +250,7 @@ def dataMerge(strTime):
     def getDaiWei(df):        
         strAddress=str(df['标准地址'])
         result=''
-        if((strAddress.find('中鹏粤')!=-1)|(strAddress.find('宝洪')!=-1)|(strAddress.find('丽普盾')!=-1)):
+        if(((strAddress.find('中鹏粤')!=-1)|(strAddress.find('宝洪')!=-1)|(strAddress.find('丽普盾')!=-1))&((strAddress.find('三水')==-1)&(strAddress.find('高明')==-1))):
             result='丽普盾'
         elif(strAddress.find('祥昊')!=-1):        
             result='祥昊'
@@ -326,11 +330,8 @@ def dataMerge(strTime):
     t1.setDaemon(True)
     t1.start()
     '''
-    try:
-        dfa.drop(['工单号1'],axis=1,inplace=True)
-    except Exception as e:
-        print(e)
-    dfa['工单号1']=dfa['工单号'].map(lambda x: "'" + str(x))
+    #明天注释掉
+   # dfa['工单号']=dfa['工单号'].map(lambda x: "'" + str(x))
 
     print("开始写入服开数据更新"+strTime[5:]+".xlsx")
     starttime=datetime.datetime.now()

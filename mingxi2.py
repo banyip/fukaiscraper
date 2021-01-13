@@ -14,7 +14,7 @@ def mingxi2(file_path,strToday,strYesterday,writer,df5):
     yesterday_path = os.path.join('output',strYesterday)    
 
     df3=pd.DataFrame(pd.read_csv(os.path.join(file_path,strYesterday+'_'+strYesterday+'orderTicket.csv'), engine='python'))
-    df3.开通工单号=df3.开通工单号.apply(lambda x:x[1:]).astype('str')
+    #df3.开通工单号=df3.开通工单号.apply(lambda x:x[1:]).astype('str')
     df3.五级地址ID=df3.五级地址ID.astype('str')
     df3.drop(['CRM业务流水号'],axis=1,inplace=True)
 
@@ -22,7 +22,7 @@ def mingxi2(file_path,strToday,strYesterday,writer,df5):
     df4.CRM业务流水号=df4.CRM业务流水号.apply(lambda x:x[1:]).astype('str')
     df4.产品名称=df4.产品名称.apply(lambda x:x[1:]).astype('str')
     df4.客户类型=df4.客户类型.apply(lambda x:x[1:]).astype('str')
-    df4.工单号=df4.工单号.apply(lambda x:x[1:]).astype('str')
+    #df4.工单号=df4.工单号.apply(lambda x:x[1:]).astype('str')
     df4.五级地址ID=df4.五级地址ID.astype('str')
 
     df4=df4[(df4['产品施工属性'] !='存量业务')]

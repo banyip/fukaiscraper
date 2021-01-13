@@ -9,6 +9,7 @@ from aip import AipOcr
 
 code_url = 'https://temip.gmcc.net/cas/captcha.htm'
 
+
 class VerificationCode:
 
 

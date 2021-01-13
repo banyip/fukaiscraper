@@ -15,11 +15,11 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5):
     
 
     df1=pd.DataFrame(pd.read_csv(os.path.join(file_path,'隔夜存量在途退单清单导出_佛山_'+strToday+'.csv'), engine='python'))
-    df1.工单号=df1.工单号.apply(lambda x:x[1:]).astype('str')
+    #df1.工单号=df1.工单号.apply(lambda x:x[1:]).astype('str')
     df1['区域']=df1['区域'].map(lambda x: str(x)[:-1])
 
     df2=pd.DataFrame(pd.read_csv(os.path.join(file_path,'家客在途单_佛山_'+strYesterday+'.csv'), engine='python'))
-    df2.工单号=df2.工单号.apply(lambda x:x[1:]).astype('str')
+    #df2.工单号=df2.工单号.apply(lambda x:x[1:]).astype('str')
     df2=df2.rename(columns={'区县':'区域'})
     df2['区域']=df2['区域'].map(lambda x: str(x)[:-1])
 
@@ -511,12 +511,22 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5):
 
     da4.to_excel(excel_writer=writer,sheet_name='正常在途数', index=False)   
     
+    
     da5=da4
     col_name = da5.columns.tolist()          # 将数据框的列名全部提取出来存放在列表里
     col_name.insert(6, '当天时间')  
-    col_name.insert(7, '超7天')           
+    col_name.insert(7, '超7天')       
     da5 = da5.reindex(columns=col_name)       # 整列都是NaN
-
+    
+    da5['工单号']=da5['工单号'].map(lambda x: "'" + str(x))
+    right=df5.loc[:,['工单号','宽带帐号']]
+    da5 = pd.merge(da5,right,on=['工单号'],how='left')
+   
+        #调整列顺序
+    da5_f=da5.宽带帐号
+    da5.drop(['宽带帐号'],axis=1,inplace=True)
+    da5.insert(14,'宽带帐号',da5_f)
+    #替换结束
     now=datetime.datetime.now() #今天的日期凌晨
     for i in range(len(da5)):
         da5.loc[i,'当天时间']=now_time

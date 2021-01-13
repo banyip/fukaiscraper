@@ -78,11 +78,11 @@ def sfLogin(drive):
                     print(captcha_str)
                     drive.find_element_by_name('validationCode').send_keys(captcha_str)                        
                     drive.execute_script("$(arguments[0]).click()", drive.find_element_by_xpath('/html/body/div[1]/form/div/div[1]/table/tbody/tr[2]/td/table/tbody/tr[1]/td/table/tbody/tr[5]/td[2]/input'))
-                    time.sleep(1)
+                    time.sleep(3)
                     break
                 else:
                     drive.find_element_by_id('validationCode').click()   
-                    time.sleep(1)                                             
+                    time.sleep(3)                                             
                     continue
             if(drive.page_source.find('验证码错误！')!=-1):
                 continue
@@ -440,6 +440,7 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
 
         starttime = datetime.datetime.now()
         
+        '''
         options.add_experimental_option('prefs',prefs)
         options.add_argument("--no-sandbox")
         drive = webdriver.Chrome(chrome_options=options)
@@ -481,7 +482,7 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
         #5. 解压
         print('解压')
         sfUnzip(output_folder_path, today_strTime,yesterday_strTime)
-
+        '''
         
         #6.整合服开数据更新12-22.csv
         print('#6.整合服开数据更新'+yesterday_strTime[5:]+'.csv')
@@ -510,7 +511,9 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
         # print(e)
         print(traceback.print_exc())
         raise e
-
+  #  finally:
+   #     drive.quit()
+        #c_service.stop()
 
 
 if __name__ == '__main__':
