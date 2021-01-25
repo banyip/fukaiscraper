@@ -7,9 +7,10 @@ Created on Mon Dec  7 15:26:34 2020
 import pandas as pd
 import datetime
 import os
+from pdExcelWriter import pdExcelWriter
 #import time
 
-def mingxi2(file_path,strToday,strYesterday,writer,df5):
+def mingxi2(file_path,strToday,strYesterday,writer,df5,pdew):
     starttime = datetime.datetime.now()
     yesterday_path = os.path.join('output',strYesterday)    
 
@@ -188,14 +189,13 @@ def mingxi2(file_path,strToday,strYesterday,writer,df5):
     
     #读取前一天的当月指标，如果当天是周一，读上周五
     currentday = datetime.datetime.strptime(strToday, '%Y-%m-%d')
-    if (currentday.weekday()>0):
-        daybefore= currentday - datetime.timedelta(days = 1)    
-    else:
-        daybefore= currentday - datetime.timedelta(days = 3)
+    daybefore= currentday - datetime.timedelta(days = 1)    
+    daybefore1= currentday - datetime.timedelta(days = 2)    
 
     daybefore_strTime = daybefore.strftime("%Y-%m-%d") 
+    daybefore1_strTime = daybefore1.strftime("%Y-%m-%d") 
     
-    file_path=os.path.join('output\\'+daybefore_strTime,'当月指标.xlsx')
+    file_path=os.path.join('output\\'+daybefore_strTime,'当月指标'+daybefore1_strTime[5:] +'.xlsx')
     df7=pd.DataFrame(pd.read_excel(file_path,sheet_name='市场兑换率（归档数）'))
 
     df8=pd.DataFrame(pd.read_excel(file_path,sheet_name='催装'))
@@ -308,8 +308,8 @@ def mingxi2(file_path,strToday,strYesterday,writer,df5):
         else:
             continue
             
-    da.to_excel(excel_writer=writer,sheet_name='市场兑换率（归档数）', index=False)
-
+    #da.to_excel(excel_writer=writer,sheet_name='市场兑换率（归档数）', index=False)
+    pdew.df2Sheet('市场兑换率（归档数）',da)
 
     #催装
     right=df5.loc[:,['工单号','CRM业务流水号']]
@@ -442,10 +442,160 @@ def mingxi2(file_path,strToday,strYesterday,writer,df5):
         
     data=dc[dc['催办-派单'] >=12]
     data.reset_index(drop=True,inplace=True)
-    data.to_excel(excel_writer=writer,sheet_name='催装', index=False)
-
+    #data.to_excel(excel_writer=writer,sheet_name='催装', index=False)
+    pdew.df2Sheet('催装',data)
 
     print('end')
     endtime = datetime.datetime.now()
     duringtime = endtime -  starttime
     print(duringtime.seconds)
+
+
+if __name__ == '__main__':
+    writer=None
+    pdew=pdExcelWriter(os.path.join('templates','倍增模板.xlsx'))
+
+    dtype={
+        #'五级地址ID':str,
+        #'CRM业务流水号':str,
+        '工单号':str,
+        '客户原因缓装申请时间': 'category',
+        'CRM业务流水号': 'object',
+        'CRM工单号': 'object',
+        'IVR拨打成功的时间': 'category',
+        'OBD端口名称': 'object',
+        'ONU厂家': 'category',
+        'ONU型号': 'category',
+        'ONU端口端口号': 'object',
+        'SN码': 'category',
+        '一级场景属性': 'category',
+        '上门测试到单时间': 'category',
+        '上门测试结束时间': 'category',
+        '下单地市': 'category',
+        '下单渠道名称': 'category',
+        '下单渠道编码': 'category',
+        '业务受理地市': 'category',
+        '中高端客户': 'category',
+        '二级地址名称': 'category',
+        '二级场景属性': 'category',
+        '五级地址ID': 'category',
+        '五级地址名称': 'category',
+        '产品业务属性': 'category',
+        '产品包ID': 'category',
+        '产品包名称': 'category',
+        '产品名称': 'category',
+        '产品实例编码': 'object',
+        '光功率达标情况': 'category',
+        '前端首次催办时间': 'category',
+        '勘察单到单时间': 'category',
+        '勘察单归档时间': 'category',
+        '勘察单现场勘查到单时间': 'category',
+        '勘察单现场勘查完成时间': 'category',
+        '勘察单调度中心到单时间': 'category',
+        '勘察单调度中心完成时间': 'category',
+        '勘察单预约上门到单时间': 'category',
+        '勘察单预约上门完成时间': 'category',
+        '原标准地址': 'category',
+        '原标准地址1': 'category',
+        '处理渠道': 'category',
+        '外线施工完成时间': 'category',
+        '外线施工开始时间': 'category',
+        '多媒体家庭电话': 'category',
+        '客户上门时限要求': 'category',
+        '客户原因缓装原因': 'category',
+        '客户原因缓装状态': 'category',
+        '客户原因缓装结束时间': 'category',
+        '客户同意缓装申请时间': 'category',
+        '客户同意缓装结束时间': 'category',
+        '客户类型': 'category',
+        '客户需求带宽': 'category',
+        '宽带帐号': 'object',
+        '宽带提供方': 'category',
+        '小区地址': 'object',
+        #'工单号': 'object',
+        '工单来源': 'category',
+        '工单状态': 'category',
+        '工单质检到单时间': 'category',
+        '工单质检完成时间': 'category',
+        '当前环节': 'category',
+        '微区名称': 'category',
+        '批次号': 'category',
+        '支付情况': 'category',
+        '支付类型': 'category',
+        '改址类型': 'category',
+        '改约原因': 'category',
+        '改约时间': 'category',
+        '数据制作到单时间': 'category',
+        '数据制作结束时间': 'category',
+        '新阶段回复': 'category',
+        '旧ONU SN码': 'category',
+        '是否480小区': 'category',
+        '是否上门收费': 'category',
+        '是否催装': 'category',
+        '是否建装一体化': 'category',
+        '是否异地': 'category',
+        '是否施工标识': 'category',
+        '是否派发给装维': 'category',
+        '是否需要后台协助': 'category',
+        '更换ONU是否成功': 'category',
+        '最新一次催办来源': 'category',
+        '最近一次的拨号开始时间': 'category',
+        '最近一次的拨号结束时间': 'category',
+        '服务厅': 'category',
+        '未预约原因': 'category',
+        '标准地址': 'object',
+        '派单日期': 'object',
+        '测速方式': 'category',
+        '测速时间': 'category',
+        '渠道类型': 'category',
+        '用户班/装维组': 'category',
+        '申请人': 'category',
+        '申请退单备注': 'category',
+        '第三方复核到单时间': 'category',
+        '第三方复核完成时间': 'category',
+        '管线资源配置环节到达时间': 'category',
+        '终端来源': 'category',
+        '结单时间': 'category',
+        '综合网格': 'category',
+        '缓装原因': 'category',
+        '缓装开始时间': 'category',
+        '缓装激活时间': 'category',
+        '网管和管线数据对比审核到单时间': 'category',
+        '装维上门时间': 'category',
+        '装维人员/用户班人员': 'category',
+        '装维人员登录账号': 'category',
+        '装维人员账号': 'category',
+        '装维修改五级地址时间': 'category',
+        '装维备注': 'category',
+        '装维组/用户班': 'category',
+        '设备型号': 'category',
+        '设备码': 'category',
+        '设备类型': 'category',
+        '调度中心到单时间': 'object',
+        '调度中心结束时间': 'object',
+        '质检整改到单时间': 'category',
+        '质检整改完成时间': 'category',
+        '资源类型': 'category',
+        '通过管线资源配置完成时间': 'category',
+        '速率变更单_前端已撤单': 'category',
+        '速率测试是否达标': 'category',
+        '速率测试达标情况': 'category',
+        '阶段回复': 'category',
+        '集中预约到单时间': 'category',
+        '集中预约结束时间': 'category',
+        '集团客户批次': 'category',
+        '预约上门时间': 'category',
+        '预约人': 'category',
+        '预约完成时间': 'category',
+        '预约状态': 'category',
+        '首次催办时间': 'category',
+        '首次催装环节': 'category',
+        '首次拨号时间': 'category',
+        '首次拨号时间.1': 'category',
+        '首次第三方复核结果': 'category',
+        '首次质检结果': 'category',
+        '首次预约上门时间': 'category',
+    }
+    dfa=pd.read_csv(os.path.join('output\\2021-01-17','服开数据更新01-16.csv'),engine='python',dtype=dtype,encoding='utf-8_sig')
+    mingxi2('output\\2021-01-18','2021-01-18','2021-01-17',writer,dfa,pdew)
+    pdew.saveWorkbook('output\\2021-01-18\\当月指标01-18.xlsx')

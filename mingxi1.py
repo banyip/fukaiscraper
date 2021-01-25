@@ -10,7 +10,7 @@ import datetime
 import time
 import os
 
-def mingxi1(file_path,strToday,strYesterday,writer,df5):
+def mingxi1(file_path,strToday,strYesterday,writer,df5,pdew):
     starttime = datetime.datetime.now()
     
 
@@ -178,6 +178,8 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5):
 
     df5.CRM业务流水号=df5.CRM业务流水号.apply(lambda x:x[1:]).astype('str')
     '''
+    #df5.宽带帐号=df5.宽带帐号.astype('str')
+    
     dtype={
         '地址ID':str,
         }
@@ -283,8 +285,8 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5):
 
 
         
-    da1.to_excel(excel_writer=writer,sheet_name='扩容单量',index=False)         
-        
+    #da1.to_excel(excel_writer=writer,sheet_name='扩容单量',index=False)         
+    pdew.df2Sheet('扩容单量',da1)   
         
     da2=df1[(( df1['操作类型'] =='业务开通')|(df1['操作类型'] =='预勘查'))&(df1['产品名称']=='家客开通')&((df1['退单状态'] =='家客退单审批-攻坚岗')|(df1['退单状态'] =='家客退单审批-物业协调岗'))&(df1['派单时间'] >='2020-01-01 00:00:00')]
     da2.reset_index(drop=True,inplace=True)
@@ -361,8 +363,8 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5):
     da2.insert(9,'七级地址',da2_t)
 
 
-    da2.to_excel(excel_writer=writer,sheet_name='攻坚单量',index=False)       
-        
+    #da2.to_excel(excel_writer=writer,sheet_name='攻坚单量',index=False)       
+    pdew.df2Sheet('攻坚单量',da2)       
         
 
     now_time = time.strftime('%Y-%m-%d',time.localtime(time.time()))+' 00:00:00' #今天的日期凌晨
@@ -439,8 +441,8 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5):
     #替换结束
 
 
-    da3.to_excel(excel_writer=writer,sheet_name='退单在途工单', index=False)      
-    
+    #da3.to_excel(excel_writer=writer,sheet_name='退单在途工单', index=False)      
+    pdew.df2Sheet('退单在途工单',da3)   
 
         
     #col_name = df2.columns.tolist()          # 将数据框的列名全部提取出来存放在列表里
@@ -509,8 +511,8 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5):
 
 
 
-    da4.to_excel(excel_writer=writer,sheet_name='正常在途数', index=False)   
-    
+    #da4.to_excel(excel_writer=writer,sheet_name='正常在途数', index=False)   
+    pdew.df2Sheet('正常在途数',da4)
     
     da5=da4
     col_name = da5.columns.tolist()          # 将数据框的列名全部提取出来存放在列表里
@@ -518,7 +520,6 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5):
     col_name.insert(7, '超7天')       
     da5 = da5.reindex(columns=col_name)       # 整列都是NaN
     
-    da5['工单号']=da5['工单号'].map(lambda x: "'" + str(x))
     right=df5.loc[:,['工单号','宽带帐号']]
     da5 = pd.merge(da5,right,on=['工单号'],how='left')
    
@@ -527,13 +528,26 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5):
     da5.drop(['宽带帐号'],axis=1,inplace=True)
     da5.insert(14,'宽带帐号',da5_f)
     #替换结束
-    now=datetime.datetime.now() #今天的日期凌晨
+
+    
+    '''
     for i in range(len(da5)):
         da5.loc[i,'当天时间']=now_time
         pdsj = datetime.datetime.strptime(da5.loc[i,'派单时间'], "%Y-%m-%d %H:%M:%S") 
         dt = datetime.datetime.strptime(da5.loc[i,'当天时间'], "%Y-%m-%d %H:%M:%S") 
         da5.loc[i,'超7天']=(dt-pdsj).days
-    da5.to_excel(excel_writer=writer,sheet_name='超长在途数', index=False)    
+    '''
+    def getOver7Days(df):
+        now=datetime.datetime.now() #今天的日期凌晨        
+        if(not pd.isnull(df['派单时间'])):
+            result=(now-df['派单时间']).days
+        else:
+            result=''
+        return result
+    da5['超7天']=da5.apply(getOver7Days,axis=1)
+    #da5.to_excel(excel_writer=writer,sheet_name='超长在途数', index=False)    
+    pdew.df2Sheet('超长在途数',da5)
+
 
 
 

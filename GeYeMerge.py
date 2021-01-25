@@ -181,18 +181,27 @@ def dataMerge(strTime):
     
     print('开始读入服开数据更新'+os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.csv'))
     #dfa=pd.read_excel(os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.xlsx'),dtype=dtype)
-    dfa=pd.read_csv(os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.csv'),engine='python',dtype=dtype,encoding='utf-8_sig')
+
+    try:
+        dfa=pd.read_csv(os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.csv'),engine='python',dtype=dtype,encoding='utf-8_sig')
+        print('read utf-8_sig')
+    except UnicodeDecodeError as e:        
+        dfa=pd.read_csv(os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.csv'),engine='python',dtype=dtype)
+        dfa['工单号']=dfa['工单号'].map(lambda x: "'" + str(x))
+        print('read utf-8')
+
+
     endtime = datetime.datetime.now()
     duringtime = endtime -  starttime
     starttime = endtime
     print("read 服开数据更新"+daybefore1_strTime[5:]+'.csv for' +str(duringtime.seconds)+'seconds')
-    df1=pd.read_csv(os.path.join(today_path,"家客工单导出_佛山(" + strTime + ").csv"),engine='python',dtype=dtype)#,ncoding='utf-8_sig')
+    df1=pd.read_csv(os.path.join(today_path,"家客工单导出_佛山(" + strTime + ").csv"),engine='python',dtype=dtype)#,encoding='utf-8_sig')
 
 
 
    #明天注释掉
     #df1['工单号']=df1['工单号'].map(lambda x: str(x[1:]))
-    #dfa['工单号']=dfa['工单号'].map(lambda x: "'" + str(x))
+    
     df1.insert(17,'区域','')
     df1.insert(18,'代维','')
     df1.insert(27,'归档时长','')
@@ -353,6 +362,6 @@ def dataMerge(strTime):
     
 if __name__ == '__main__':
     threads = []
-    dataMerge('2021-01-11')
+    dataMerge('2021-01-22')
     for t in threads:        
         t.join()
