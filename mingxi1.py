@@ -282,9 +282,17 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5,pdew):
     da1.insert(8,'网格',da1_s)
     da1.insert(9,'七级地址',da1_t)
     #替换结束
-
-
+    for i in range(len(da1)):
+        if (pd.isnull(da1.loc[i,'区域'])):
+            da1.loc[i,'区域']=da1.loc[i,'七级地址'][3:5]
+        else:
+            continue
         
+    for i in range(len(da1)):
+        if (pd.isnull(da1.loc[i,'网格'])):
+            da1.loc[i,'网格']=da1.loc[i,'七级地址'][8:10]
+        else:
+            continue
     #da1.to_excel(excel_writer=writer,sheet_name='扩容单量',index=False)         
     pdew.df2Sheet('扩容单量',da1)   
         
@@ -361,7 +369,19 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5,pdew):
     da2.insert(7,'五级地址',da2_f)
     da2.insert(8,'网格',da2_s)
     da2.insert(9,'七级地址',da2_t)
-
+    
+    for i in range(len(da2)):
+        if (pd.isnull(da2.loc[i,'区域'])):
+            da2.loc[i,'区域']=da2.loc[i,'七级地址'][3:5]
+        else:
+            continue
+        
+    for i in range(len(da2)):
+        if (pd.isnull(da2.loc[i,'网格'])):
+            da2.loc[i,'网格']=da2.loc[i,'七级地址'][8:10]
+        else:
+            continue
+    
 
     #da2.to_excel(excel_writer=writer,sheet_name='攻坚单量',index=False)       
     pdew.df2Sheet('攻坚单量',da2)       
@@ -439,7 +459,17 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5,pdew):
     da3.insert(8,'网格',da3_s)
     da3.insert(9,'七级地址',da3_t)
     #替换结束
-
+    for i in range(len(da3)):
+        if (pd.isnull(da3.loc[i,'区域'])):
+            da3.loc[i,'区域']=da3.loc[i,'七级地址'][3:5]
+        else:
+            continue
+        
+    for i in range(len(da3)):
+        if (pd.isnull(da3.loc[i,'网格'])):
+            da3.loc[i,'网格']=da3.loc[i,'七级地址'][8:10]
+        else:
+            continue
 
     #da3.to_excel(excel_writer=writer,sheet_name='退单在途工单', index=False)      
     pdew.df2Sheet('退单在途工单',da3)   
