@@ -579,6 +579,6 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
 
 
 if __name__ == '__main__':
-    sfBeiZengDataExport(resource_path('output'))
+    sfBeiZengDataExport(resource_path('d:\\output\\倍增'))
 
 
