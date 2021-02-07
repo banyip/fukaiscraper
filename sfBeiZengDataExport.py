@@ -24,6 +24,27 @@ import mingxi2
 import pandas as pd
 import openpyxl
 import threading
+from Logger import Logger
+#import PyMail
+from pdExcelWriter import pdExcelWriter
+
+
+def sendEmail(self, reciver, subject, body, *attachmentFilePaths):
+    '''
+    发送邮件
+    :param reciver:
+    :param subject:
+    :param body:
+    :param attachmentFilePaths:
+    :return:
+    '''
+    sml = PyMail.SendMailDealer()
+    sml.setMailInfo(reciver, subject, body, 'plain', *attachmentFilePaths)
+    sml.sendMail()
+    print('邮件发送成功')
+    sml.__del__()
+
+
 def resource_path(relative_path):
     if getattr(sys, 'frozen', False): #是否Bundle Resource
         base_path = sys._MEIPASS
@@ -78,11 +99,11 @@ def sfLogin(drive):
                     print(captcha_str)
                     drive.find_element_by_name('validationCode').send_keys(captcha_str)                        
                     drive.execute_script("$(arguments[0]).click()", drive.find_element_by_xpath('/html/body/div[1]/form/div/div[1]/table/tbody/tr[2]/td/table/tbody/tr[1]/td/table/tbody/tr[5]/td[2]/input'))
-                    time.sleep(3)
+                    time.sleep(1)
                     break
                 else:
                     drive.find_element_by_id('validationCode').click()   
-                    time.sleep(3)                                             
+                    time.sleep(1)                                             
                     continue
             if(drive.page_source.find('验证码错误！')!=-1):
                 continue
@@ -109,10 +130,10 @@ def sfDuiXianLv(drive,strTime):
 
         drive.switch_to.parent_frame()
         iframe=drive.find_element_by_name("mainFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
         iframe=drive.find_element_by_name("leftFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
         drive.find_element_by_link_text('家客质量管控').click()
         drive.find_element_by_link_text('480管控报表').click()
 
@@ -120,7 +141,7 @@ def sfDuiXianLv(drive,strTime):
 
         drive.switch_to.parent_frame()
         iframe=drive.find_element_by_name("contFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
         textinput = drive.find_element_by_id('actions')
         textinput.click()
@@ -160,19 +181,19 @@ def sfDuiXianLv(drive,strTime):
 #2. 家客在途单 家客在途单_佛山_2020-12-21（.zip）
 def sfZaiTuTuiDan(drive,strTime):
 
-        drive.switch_to_default_content()
+        drive.switch_to.default_content()
         iframe=drive.find_element_by_name("mainFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
         iframe=drive.find_element_by_name("leftFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
         drive.find_element_by_id('sd163').click()
         
 
 
         drive.switch_to.parent_frame()
         iframe=drive.find_element_by_name("contFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
         #操作类型
         textinput = drive.find_element_by_id('actionType')
@@ -207,19 +228,26 @@ def sfZaiTuTuiDan(drive,strTime):
 
 #3. 退单在途工单 隔夜存量在途退单清单导出_佛山_2020-12-22
 def sfTuiDanZaiTuGongDan(drive,strTime):
-        drive.switch_to_default_content()
+        '''
+        drive.switch_to.default_content()
+        iframe = drive.find_element_by_name("topFrame")
+        drive.switch_to.frame(iframe)
+        my_jobs_button = drive.find_element_by_link_text('查询统计')
+        my_jobs_button.click()
+        '''
+        drive.switch_to.default_content()
         iframe=drive.find_element_by_name("mainFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
         iframe=drive.find_element_by_name("leftFrame")
-        drive.switch_to_frame(iframe)
-        drive.find_element_by_id('sd165').click()
+        drive.switch_to.frame(iframe)
+        drive.find_element_by_link_text('退单审核管控').click()
         
 
 
         drive.switch_to.parent_frame()
         iframe=drive.find_element_by_name("contFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
 
         textinput=drive.find_element_by_id('countTime')
@@ -241,7 +269,7 @@ def sfTuiDanZaiTuGongDan(drive,strTime):
 #4. 催装报表 ReminderOrderTicket（.csv）
 def sfCuiZhuangBaobiao(drive,startTime,endTime):
 
-        drive.switch_to_default_content()
+        drive.switch_to.default_content()
         while True:
             try:
                 iframe = drive.find_element_by_name("topFrame")
@@ -255,10 +283,10 @@ def sfCuiZhuangBaobiao(drive,startTime,endTime):
 
         drive.switch_to.parent_frame()
         iframe=drive.find_element_by_name("mainFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
         iframe=drive.find_element_by_name("leftFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
         drive.find_element_by_link_text('督办').click()
         drive.find_element_by_link_text('催办单管理').click()
         drive.find_element_by_link_text('催办查询').click()
@@ -266,10 +294,10 @@ def sfCuiZhuangBaobiao(drive,startTime,endTime):
 
         drive.switch_to.parent_frame()
         iframe=drive.find_element_by_name("contFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
         iframe=drive.find_element_by_name("topFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
         textinput=drive.find_element_by_id('requestFirstDate_start')
         textinput.clear()
@@ -283,7 +311,7 @@ def sfCuiZhuangBaobiao(drive,startTime,endTime):
 
 
         drive.execute_script('exportToCSV()')
-        t=drive.switch_to_alert()
+        t=drive.switch_to.alert
         t.accept()
         time.sleep(15)
         windows = drive.window_handles 
@@ -312,10 +340,10 @@ def sfGeYeGongDanDaoChu(drive,strTime):
 
         drive.switch_to.parent_frame()
         iframe=drive.find_element_by_name("mainFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
         iframe=drive.find_element_by_name("leftFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
         drive.find_element_by_link_text('查询').click()
         drive.find_element_by_link_text('隔夜工单数据导出').click()
 
@@ -323,7 +351,7 @@ def sfGeYeGongDanDaoChu(drive,strTime):
 
         drive.switch_to.parent_frame()
         iframe=drive.find_element_by_name("contFrame")
-        drive.switch_to_frame(iframe)
+        drive.switch_to.frame(iframe)
 
 
 
@@ -372,8 +400,9 @@ def sfUnzip(output_folder_path,strTime,strYesterday):
             name1 = names.encode('cp437').decode('gbk')
         except:
             name1 = names.encode('utf-8').decode('utf-8')
-        zip_file.extract(names,output_folder_path)
-        os.rename(os.path.join(output_folder_path,names),os.path.join(output_folder_path,name1))
+        if not os.path.exists(os.path.join(output_folder_path,name1)):
+            zip_file.extract(names,output_folder_path)
+            os.rename(os.path.join(output_folder_path,names),os.path.join(output_folder_path,name1))
     zip_file.close()
 
     file_name = os.path.join(output_folder_path,'家客在途单_佛山_'+strYesterday + '.zip')
@@ -383,10 +412,27 @@ def sfUnzip(output_folder_path,strTime,strYesterday):
             name1 = names.encode('cp437').decode('gbk')
         except:
             name1 = names.encode('utf-8').decode('utf-8')
-        zip_file.extract(names,output_folder_path)
-        os.rename(os.path.join(output_folder_path,names),os.path.join(output_folder_path,name1))
+        if not os.path.exists(os.path.join(output_folder_path,name1)):
+            zip_file.extract(names,output_folder_path)
+            os.rename(os.path.join(output_folder_path,names),os.path.join(output_folder_path,name1))
     zip_file.close()
 
+def sfwriteExcelOptions(pdew,strTime):
+    currentday = datetime.datetime.strptime(strTime, '%Y-%m-%d')
+    daybefore=currentday - datetime.timedelta(days=1)
+    daysfrommonday = daybefore.weekday()
+    daysfromfirstdayofthemonth = 7
+   
+
+
+    dateformonday_str=(currentday - datetime.timedelta(days = daysfromfirstdayofthemonth)).strftime("%Y-%m-%d")
+    firstdayofthismonth_str = (daybefore - datetime.timedelta(days = daysfromfirstdayofthemonth - 1 )).strftime("%Y-%m-%d")
+    daybefore_str=daybefore.strftime('%Y-%m-%d')
+    
+    pdoptions=pd.DataFrame({'name':['currentdate','dateformonday','daysfrommonday','firstdayofthismonth','daybefore','daysfromfirstdayofthemonth'], \
+        'value':[strTime[:10],dateformonday_str,daysfrommonday,firstdayofthismonth_str,daybefore_str,daysfromfirstdayofthemonth], \
+        'description':['当前日期','本周周一日期','周一到昨天的天数','每月1号','前一天日期','当月1号到昨天的天数'] })
+    pdew.df2Sheet('options',pdoptions)
 
 def sfBeiZengDataExport(output_folder_path,_signal=None):
 
@@ -403,7 +449,7 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
     
     #获取当日字符串: 
     today_strTime = (datetime.datetime.now()).strftime("%Y-%m-%d") 
-  
+    
     #获取昨日字符串: 
 
     yesterday_strTime = (datetime.datetime.now() - datetime.timedelta(days = 1)) .strftime("%Y-%m-%d") 
@@ -416,20 +462,9 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
 
 #        row_num = dataFrame_query_info.shape[0]
 
-        '''
-        ie_options = webdriver.IeOptions()
-        ie_options.SWITCHES = "-private"
-        ie_options.force_create_process_api = True
 
-        c_service = Service(resource_path(os.path.join('drivers', 'IEDriverServer.exe')))
-        c_service.command_line_args()
-        c_service.start()
-        drive = webdriver.Ie(executable_path=resource_path(os.path.join('drivers', 'IEDriverServer.exe')),\
-                             options=ie_options)
-
-        '''
-
-
+        
+        
         output_folder_path=os.path.join(output_folder_path,today_strTime)
         options = webdriver.ChromeOptions()
         
@@ -439,15 +474,21 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
                     #设置为0表示禁止弹出窗口，                     #设置文件下载路径
 
         starttime = datetime.datetime.now()
-        
-        '''
+        print('开始时间：'+starttime.strftime("%Y-%m-%d %H-%M-%S"))
+        dfa=None
+
         options.add_experimental_option('prefs',prefs)
         options.add_argument("--no-sandbox")
+        
         drive = webdriver.Chrome(chrome_options=options)
-
+        
         drive.implicitly_wait(20)
         drive.maximize_window()
+
+        lg = Logger(os.path.join(output_folder_path,starttime.strftime("%Y-%m-%d %H-%M-%S")+'.log'))
+        sys.stdout = lg
         
+        sys.stderr = lg
         
         drive.get("http://sf.gmcc.net:7001/mobilesg/checkUsergd.action")
 
@@ -457,63 +498,84 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
         sfLogin(drive)
 
         #1.来单兑现率2020-12-21_2020-12-21orderTicket.csv
-        print('下载来单兑现率'+yesterday_strTime+'_'+yesterday_strTime+'_orderTicket.csv')
-        sfDuiXianLv(drive,yesterday_strTime)
+        if not os.path.exists(os.path.join(output_folder_path,yesterday_strTime+'_'+yesterday_strTime+'orderTicket.csv')):
+            print('下载来单兑现率'+yesterday_strTime+'_'+yesterday_strTime+'orderTicket.csv')
+            sfDuiXianLv(drive,yesterday_strTime)
 
         #5. 隔夜工单数据导出家客工单导出_佛山_2020-12-22-2020-12-22（.zip）
-        print('隔夜工单数据导出家客工单导出_佛山_'+today_strTime+'-'+ today_strTime+'（.zip）')
-        sfGeYeGongDanDaoChu(drive,today_strTime)
+        if not os.path.exists(os.path.join(output_folder_path,'家客工单导出_佛山_'+today_strTime+'-'+ today_strTime+'.zip')):
+            print('隔夜工单数据导出家客工单导出_佛山_'+today_strTime+'-'+ today_strTime+'.zip')
+            sfGeYeGongDanDaoChu(drive,today_strTime)
         
         #2. 家客在途单 家客在途单_佛山_2020-12-21（.zip）
-        print('家客在途单 家客在途单_佛山_'+yesterday_strTime+'（.zip）')
-        sfZaiTuTuiDan(drive,yesterday_strTime)
-        
-        #3. 退单在途工单 隔夜存量在途退单清单导出_佛山_2020-12-22
-        print('退单在途工单 隔夜存量在途退单清单导出_佛山_'+today_strTime)
-        sfTuiDanZaiTuGongDan(drive,today_strTime)
-        
+        if not os.path.exists(os.path.join(output_folder_path,'家客在途单_佛山_'+yesterday_strTime+'.zip')):
+            print('家客在途单 家客在途单_佛山_'+yesterday_strTime+'（.zip）')
+            sfZaiTuTuiDan(drive,yesterday_strTime)
+
+        #3. 退单在途工单 隔夜存量在途退单清单导出_佛山_2020-12-22        
+        if not os.path.exists(os.path.join(output_folder_path,'隔夜存量在途退单清单导出_佛山_'+today_strTime+'.csv')):
+            print('退单在途工单 隔夜存量在途退单清单导出_佛山_'+today_strTime)
+            sfTuiDanZaiTuGongDan(drive,today_strTime)
+
         #4. 催装报表 ReminderOrderTicket（.csv）
-        print('催装报表 ReminderOrderTicket（.csv）')
-        sfCuiZhuangBaobiao(drive,yesterday_strTime,today_strTime)
+        if not os.path.exists(os.path.join(output_folder_path,'ReminderOrderTicket.csv')):
+            print('催装报表 ReminderOrderTicket.csv')
+            sfCuiZhuangBaobiao(drive,yesterday_strTime,today_strTime)
 
         drive.close()
 
-        
+
+
         #5. 解压
         print('解压')
         sfUnzip(output_folder_path, today_strTime,yesterday_strTime)
-        '''
         
-        #6.整合服开数据更新12-22.csv
-        print('#6.整合服开数据更新'+yesterday_strTime[5:]+'.csv')
-        dfa=GeYeMerge.dataMerge(today_strTime)
+
+        if (not os.path.exists(os.path.join(output_folder_path,'服开数据更新'+yesterday_strTime[5:]+'.csv'))) or (not os.path.exists(os.path.join(output_folder_path,'当月指标'+yesterday_strTime[5:]+'.xlsx'))):
+            #6.整合服开数据更新12-22.csv
+            print('#6.整合服开数据更新'+yesterday_strTime[5:]+'.csv')
+            dfa=GeYeMerge.dataMerge(today_strTime)
+        
         
 
         
-        #7.mingxi1
-        print('mingxi1')        
-        writer=pd.ExcelWriter(os.path.join(output_folder_path,"当月指标.xlsx"),engine='openpyxl')
-        mingxi1.mingxi1(output_folder_path,today_strTime,yesterday_strTime,writer,dfa)
-        
-        #8.mingxi2
-        print('mingxi2')
-        mingxi2.mingxi2(output_folder_path,today_strTime,yesterday_strTime,writer,dfa)
-        writer.save()
-        writer.close()
-        
+            midtime = datetime.datetime.now()
+            print('开始创建pdew')
+            pdew=pdExcelWriter(os.path.join('templates','倍增模板.xlsx'))
+            sfwriteExcelOptions(pdew,today_strTime)     
+    
+            endtime = datetime.datetime.now()
+            duringtime = endtime -  midtime                
+            print('完成创建pdew for ' + str(duringtime.seconds) + '秒')        
+            
+
+            #7.mingxi1
+            print('mingxi1')        
+            #writer=pd.ExcelWriter(os.path.join(output_folder_path,"当月指标.xlsx"),engine='openpyxl')
+            writer=None
+            mingxi1.mingxi1(output_folder_path,today_strTime,yesterday_strTime,writer,dfa,pdew)
+            
+            #8.mingxi2
+            print('mingxi2')
+            mingxi2.mingxi2(output_folder_path,today_strTime,yesterday_strTime,writer,dfa,pdew)
+            #writer.save()
+            #writer.close()
+            
+            pdew.saveWorkbook(os.path.join(output_folder_path,'当月指标'+yesterday_strTime[5:]+'.xlsx'))
+
         endtime = datetime.datetime.now()
         duringtime = endtime -  starttime
         print("all for" +str(duringtime.seconds)+'seconds')
-
+        
+        #sendEmail('13923110117@139.com', '倍增指标'+today_strTime[5:0], '倍增指标'+today_strTime[5:0],*[os.path.join(output_folder_path,'当月指标'+today_strTime[5:]+'.xlsx')])
         time.sleep(5)
+        
 
     except Exception as e:
         # print(e)
         print(traceback.print_exc())
         raise e
-  #  finally:
-   #     drive.quit()
-        #c_service.stop()
+
 
 
 if __name__ == '__main__':

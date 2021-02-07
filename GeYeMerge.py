@@ -178,23 +178,24 @@ def dataMerge(strTime):
         '首次预约上门时间': 'category',
     }
     
-    
-    print('开始读入服开数据更新'+os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.csv'))
-    #dfa=pd.read_excel(os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.xlsx'),dtype=dtype)
+    if not daybefore.day==1:
+        print('开始读入服开数据更新'+os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.csv'))   
+        try:
+            dfa=pd.read_csv(os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.csv'),engine='python',dtype=dtype,encoding='utf-8_sig')
+            print('read utf-8_sig')
+        except UnicodeDecodeError as e:        
+            dfa=pd.read_csv(os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.csv'),engine='python',dtype=dtype)
+            dfa['工单号']=dfa['工单号'].map(lambda x: "'" + str(x))
+            print('read utf-8')
+        endtime = datetime.datetime.now()
+        duringtime = endtime -  starttime
+        starttime = endtime
+        print("read 服开数据更新"+daybefore1_strTime[5:]+'.csv for' +str(duringtime.seconds)+'seconds')        
+    else:
+        dfa=pd.DataFrame()
 
-    try:
-        dfa=pd.read_csv(os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.csv'),engine='python',dtype=dtype,encoding='utf-8_sig')
-        print('read utf-8_sig')
-    except UnicodeDecodeError as e:        
-        dfa=pd.read_csv(os.path.join(yesterday_path,'服开数据更新'+daybefore1_strTime[5:]+'.csv'),engine='python',dtype=dtype)
-        dfa['工单号']=dfa['工单号'].map(lambda x: "'" + str(x))
-        print('read utf-8')
 
 
-    endtime = datetime.datetime.now()
-    duringtime = endtime -  starttime
-    starttime = endtime
-    print("read 服开数据更新"+daybefore1_strTime[5:]+'.csv for' +str(duringtime.seconds)+'seconds')
     df1=pd.read_csv(os.path.join(today_path,"家客工单导出_佛山(" + strTime + ").csv"),engine='python',dtype=dtype)#,encoding='utf-8_sig')
 
 
@@ -342,7 +343,7 @@ def dataMerge(strTime):
     #明天注释掉
    # dfa['工单号']=dfa['工单号'].map(lambda x: "'" + str(x))
 
-    print("开始写入服开数据更新"+strTime[5:]+".xlsx")
+    print("开始写入服开数据更新"+strTime[5:]+".csv")
     starttime=datetime.datetime.now()
     dfa.to_csv(os.path.join(today_path , "服开数据更新"+yesterday_strTime[5:]+".csv"),encoding='utf-8_sig',index=False)
     endtime = datetime.datetime.now()
