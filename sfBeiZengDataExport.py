@@ -242,13 +242,16 @@ def sfTuiDanZaiTuGongDan(drive,strTime):
             iframe=drive.find_element_by_name("leftFrame")
             drive.switch_to.frame(iframe)            
             drive.find_element_by_link_text('家客质量管控').click()
-        
+
+                
+
         drive.switch_to.default_content()
         iframe=drive.find_element_by_name("mainFrame")
         drive.switch_to.frame(iframe)
 
         iframe=drive.find_element_by_name("leftFrame")
         drive.switch_to.frame(iframe)
+        drive.find_element_by_link_text('家客质量管控').click()
         drive.find_element_by_link_text('退单审核管控').click()
         
 
