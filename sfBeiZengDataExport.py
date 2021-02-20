@@ -13,7 +13,7 @@ import time
 import datetime
 import os
 import pandas
-import sys
+import sys,getopt
 import re
 import traceback
 import logging
@@ -228,13 +228,21 @@ def sfZaiTuTuiDan(drive,strTime):
 
 #3. 退单在途工单 隔夜存量在途退单清单导出_佛山_2020-12-22
 def sfTuiDanZaiTuGongDan(drive,strTime):
-        '''
-        drive.switch_to.default_content()
-        iframe = drive.find_element_by_name("topFrame")
-        drive.switch_to.frame(iframe)
-        my_jobs_button = drive.find_element_by_link_text('查询统计')
-        my_jobs_button.click()
-        '''
+        
+        if drive.page_source.find('退单审核管控')==-1:
+            drive.switch_to.default_content()
+            iframe = drive.find_element_by_name("topFrame")
+            drive.switch_to.frame(iframe)
+            my_jobs_button = drive.find_element_by_link_text('查询统计')
+            my_jobs_button.click()
+            drive.switch_to.parent_frame()
+            iframe=drive.find_element_by_name("mainFrame")
+            drive.switch_to.frame(iframe)
+
+            iframe=drive.find_element_by_name("leftFrame")
+            drive.switch_to.frame(iframe)            
+            drive.find_element_by_link_text('家客质量管控').click()
+        
         drive.switch_to.default_content()
         iframe=drive.find_element_by_name("mainFrame")
         drive.switch_to.frame(iframe)
@@ -443,7 +451,6 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
 
     TIME_STR_FORMAT = '%#Y{y}%#m{m}%#d{d}%#H{h}%#M{f}%#S{s}'
     posfix = time.strftime(TIME_STR_FORMAT, time.localtime()).format(y='年', m='月', d='日', h='时', f='分', s='秒提交')
-    result_file_path = os.path.join(output_folder_path, '退单执行结果-' + posfix + '.xlsx')
 
 
     
@@ -465,11 +472,11 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
 
         
         
-        output_folder_path=os.path.join(output_folder_path,today_strTime)
+        today_output_folder_path=os.path.join(output_folder_path,today_strTime)
         options = webdriver.ChromeOptions()
         
 
-        prefs = { 'profile.default_content_settings.popups':0 ,'download.default_directory': output_folder_path,"profile.content_settings.exceptions.automatic_downloads.*.setting":1}
+        prefs = { 'profile.default_content_settings.popups':0 ,'download.default_directory': today_output_folder_path,"profile.content_settings.exceptions.automatic_downloads.*.setting":1}
 
                     #设置为0表示禁止弹出窗口，                     #设置文件下载路径
 
@@ -485,7 +492,7 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
         drive.implicitly_wait(20)
         drive.maximize_window()
 
-        lg = Logger(os.path.join(output_folder_path,starttime.strftime("%Y-%m-%d %H-%M-%S")+'.log'))
+        lg = Logger(os.path.join(today_output_folder_path,starttime.strftime("%Y-%m-%d %H-%M-%S")+'.log'))
         sys.stdout = lg
         
         sys.stderr = lg
@@ -498,27 +505,27 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
         sfLogin(drive)
 
         #1.来单兑现率2020-12-21_2020-12-21orderTicket.csv
-        if not os.path.exists(os.path.join(output_folder_path,yesterday_strTime+'_'+yesterday_strTime+'orderTicket.csv')):
+        if not os.path.exists(os.path.join(today_output_folder_path,yesterday_strTime+'_'+yesterday_strTime+'orderTicket.csv')):
             print('下载来单兑现率'+yesterday_strTime+'_'+yesterday_strTime+'orderTicket.csv')
             sfDuiXianLv(drive,yesterday_strTime)
 
         #5. 隔夜工单数据导出家客工单导出_佛山_2020-12-22-2020-12-22（.zip）
-        if not os.path.exists(os.path.join(output_folder_path,'家客工单导出_佛山_'+today_strTime+'-'+ today_strTime+'.zip')):
+        if not os.path.exists(os.path.join(today_output_folder_path,'家客工单导出_佛山_'+today_strTime+'-'+ today_strTime+'.zip')):
             print('隔夜工单数据导出家客工单导出_佛山_'+today_strTime+'-'+ today_strTime+'.zip')
             sfGeYeGongDanDaoChu(drive,today_strTime)
         
         #2. 家客在途单 家客在途单_佛山_2020-12-21（.zip）
-        if not os.path.exists(os.path.join(output_folder_path,'家客在途单_佛山_'+yesterday_strTime+'.zip')):
+        if not os.path.exists(os.path.join(today_output_folder_path,'家客在途单_佛山_'+yesterday_strTime+'.zip')):
             print('家客在途单 家客在途单_佛山_'+yesterday_strTime+'（.zip）')
             sfZaiTuTuiDan(drive,yesterday_strTime)
 
         #3. 退单在途工单 隔夜存量在途退单清单导出_佛山_2020-12-22        
-        if not os.path.exists(os.path.join(output_folder_path,'隔夜存量在途退单清单导出_佛山_'+today_strTime+'.csv')):
+        if not os.path.exists(os.path.join(today_output_folder_path,'隔夜存量在途退单清单导出_佛山_'+today_strTime+'.csv')):
             print('退单在途工单 隔夜存量在途退单清单导出_佛山_'+today_strTime)
             sfTuiDanZaiTuGongDan(drive,today_strTime)
 
         #4. 催装报表 ReminderOrderTicket（.csv）
-        if not os.path.exists(os.path.join(output_folder_path,'ReminderOrderTicket.csv')):
+        if not os.path.exists(os.path.join(today_output_folder_path,'ReminderOrderTicket.csv')):
             print('催装报表 ReminderOrderTicket.csv')
             sfCuiZhuangBaobiao(drive,yesterday_strTime,today_strTime)
 
@@ -528,10 +535,10 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
 
         #5. 解压
         print('解压')
-        sfUnzip(output_folder_path, today_strTime,yesterday_strTime)
+        sfUnzip(today_output_folder_path, today_strTime,yesterday_strTime)
         
 
-        if (not os.path.exists(os.path.join(output_folder_path,'服开数据更新'+yesterday_strTime[5:]+'.csv'))) or (not os.path.exists(os.path.join(output_folder_path,'当月指标'+yesterday_strTime[5:]+'.xlsx'))):
+        if (not os.path.exists(os.path.join(today_output_folder_path,'服开数据更新'+yesterday_strTime[5:]+'.csv'))) or (not os.path.exists(os.path.join(today_output_folder_path,'当月指标'+yesterday_strTime[5:]+'.xlsx'))):
             #6.整合服开数据更新12-22.csv
             print('#6.整合服开数据更新'+yesterday_strTime[5:]+'.csv')
             dfa=GeYeMerge.dataMerge(today_strTime)
@@ -551,7 +558,7 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
 
             #7.mingxi1
             print('mingxi1')        
-            #writer=pd.ExcelWriter(os.path.join(output_folder_path,"当月指标.xlsx"),engine='openpyxl')
+            #writer=pd.ExcelWriter(os.path.join(today_output_folder_path,"当月指标.xlsx"),engine='openpyxl')
             writer=None
             mingxi1.mingxi1(output_folder_path,today_strTime,yesterday_strTime,writer,dfa,pdew)
             
@@ -561,7 +568,7 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
             #writer.save()
             #writer.close()
             
-            pdew.saveWorkbook(os.path.join(output_folder_path,'当月指标'+yesterday_strTime[5:]+'.xlsx'))
+            pdew.saveWorkbook(os.path.join(today_output_folder_path,'当月指标'+yesterday_strTime[5:]+'.xlsx'))
 
         endtime = datetime.datetime.now()
         duringtime = endtime -  starttime
@@ -579,6 +586,15 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
 
 
 if __name__ == '__main__':
-    sfBeiZengDataExport(resource_path('d:\\output\\倍增'))
+    argv=sys.argv[1:]
+    outputfolder=resource_path('output')
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+    except getopt.GetoptError:
+        print(traceback.print_exc())
+    for opt, arg in opts:
+        if opt in ("-o", "--output"):
+            outputfolder = arg
+    sfBeiZengDataExport(outputfolder)
 
 

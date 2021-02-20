@@ -184,7 +184,7 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5,pdew):
         '地址ID':str,
         }
 
-    df6=pd.DataFrame(pd.read_excel(os.path.join('output','小区和网格关联关系.xls'),sheet_name='第1页',dtype=dtype))
+    df6=pd.DataFrame(pd.read_excel(os.path.join(file_path,'小区和网格关联关系.xls'),sheet_name='第1页',dtype=dtype))
 
     #col_name = df1.columns.tolist()          # 将数据框的列名全部提取出来存放在列表里
     ''' 以下列通过关联获取，不需新增
