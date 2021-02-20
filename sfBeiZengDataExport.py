@@ -229,7 +229,20 @@ def sfZaiTuTuiDan(drive,strTime):
 #3. 退单在途工单 隔夜存量在途退单清单导出_佛山_2020-12-22
 def sfTuiDanZaiTuGongDan(drive,strTime):
         
-        if drive.page_source.find('退单审核管控')==-1:
+        drive.switch_to.default_content()
+        iframe=drive.find_element_by_name("mainFrame")
+        drive.switch_to.frame(iframe)
+
+        iframe=drive.find_element_by_name("leftFrame")
+        drive.switch_to.frame(iframe)
+
+        #drive.find_element_by_link_text('家客质量管控').click()
+
+
+
+        try:
+            drive.find_element_by_link_text('退单审核管控').click()
+        except:
             drive.switch_to.default_content()
             iframe = drive.find_element_by_name("topFrame")
             drive.switch_to.frame(iframe)
@@ -240,20 +253,9 @@ def sfTuiDanZaiTuGongDan(drive,strTime):
             drive.switch_to.frame(iframe)
 
             iframe=drive.find_element_by_name("leftFrame")
-            drive.switch_to.frame(iframe)            
+            drive.switch_to.frame(iframe)
             drive.find_element_by_link_text('家客质量管控').click()
-
-                
-
-        drive.switch_to.default_content()
-        iframe=drive.find_element_by_name("mainFrame")
-        drive.switch_to.frame(iframe)
-
-        iframe=drive.find_element_by_name("leftFrame")
-        drive.switch_to.frame(iframe)
-        drive.find_element_by_link_text('家客质量管控').click()
-        drive.find_element_by_link_text('退单审核管控').click()
-        
+            drive.find_element_by_link_text('退单审核管控').click() 
 
 
         drive.switch_to.parent_frame()
