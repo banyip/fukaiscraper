@@ -13,7 +13,7 @@ import threading
 
 #文件服开数据更新处理
 
-def dataMerge(strTime):
+def dataMerge(output_folder_path,strTime):
     starttime = datetime.datetime.now()
     currentday = datetime.datetime.strptime(strTime, '%Y-%m-%d')
     yesterday_strTime=(currentday - datetime.timedelta(days = 1)).strftime("%Y-%m-%d") 
@@ -32,8 +32,8 @@ def dataMerge(strTime):
     daybefore1=daybefore - datetime.timedelta(days = 1)
     daybefore_strTime = daybefore.strftime("%Y-%m-%d") 
     daybefore1_strTime = daybefore1.strftime("%Y-%m-%d") 
-    today_path = os.path.join('output',strTime)
-    yesterday_path = os.path.join('output',daybefore_strTime)
+    today_path = os.path.join(output_folder_path,strTime)
+    yesterday_path = os.path.join(output_folder_path,daybefore_strTime)
     
 
     dtype={

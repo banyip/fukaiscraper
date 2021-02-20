@@ -546,7 +546,7 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
         if (not os.path.exists(os.path.join(today_output_folder_path,'服开数据更新'+yesterday_strTime[5:]+'.csv'))) or (not os.path.exists(os.path.join(today_output_folder_path,'当月指标'+yesterday_strTime[5:]+'.xlsx'))):
             #6.整合服开数据更新12-22.csv
             print('#6.整合服开数据更新'+yesterday_strTime[5:]+'.csv')
-            dfa=GeYeMerge.dataMerge(today_strTime)
+            dfa=GeYeMerge.dataMerge(output_folder_path,today_strTime)
         
         
 
