@@ -15,12 +15,12 @@ def mingxi2(file_path,strToday,strYesterday,writer,df5,pdew):
     today_path=os.path.join(file_path,strToday)
     yesterday_path = os.path.join(file_path,strYesterday)    
 
-    df3=pd.DataFrame(pd.read_csv(os.path.join(file_path,strYesterday+'_'+strYesterday+'orderTicket.csv'), engine='python'))
+    df3=pd.DataFrame(pd.read_csv(os.path.join(today_path,strYesterday+'_'+strYesterday+'orderTicket.csv'), engine='python'))
     #df3.开通工单号=df3.开通工单号.apply(lambda x:x[1:]).astype('str')
     df3.五级地址ID=df3.五级地址ID.astype('str')
     df3.drop(['CRM业务流水号'],axis=1,inplace=True)
 
-    df4=pd.DataFrame(pd.read_csv(os.path.join(today_file_path,'ReminderOrderTicket.csv'), engine='python',dtype={'五级地址ID': str,}))#催单
+    df4=pd.DataFrame(pd.read_csv(os.path.join(today_path,'ReminderOrderTicket.csv'), engine='python',dtype={'五级地址ID': str,}))#催单
     df4.CRM业务流水号=df4.CRM业务流水号.apply(lambda x:x[1:]).astype('str')
     df4.产品名称=df4.产品名称.apply(lambda x:x[1:]).astype('str')
     df4.客户类型=df4.客户类型.apply(lambda x:x[1:]).astype('str')
@@ -197,7 +197,7 @@ def mingxi2(file_path,strToday,strYesterday,writer,df5,pdew):
     daybefore1_strTime = daybefore1.strftime("%Y-%m-%d") 
     
     #file_path=os.path.join('output\\'+daybefore_strTime,'当月指标'+daybefore1_strTime[5:] +'.xlsx')
-    destfilename=os.path.join(today_file_path,daybefore_strTime,'当月指标'+daybefore1_strTime[5:] +'.xlsx')
+    destfilename=os.path.join(file_path,daybefore_strTime,'当月指标'+daybefore1_strTime[5:] +'.xlsx')
     df7=pd.DataFrame(pd.read_excel(destfilename,sheet_name='市场兑换率（归档数）'))
 
     df8=pd.DataFrame(pd.read_excel(destfilename,sheet_name='催装'))
