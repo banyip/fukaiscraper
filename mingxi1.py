@@ -14,11 +14,11 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5,pdew):
     starttime = datetime.datetime.now()
     
     today_output_folder_path=os.path.join(file_path,strToday)
-    df1=pd.DataFrame(pd.read_csv(os.path.join(today_output_folder_path,'隔夜存量在途退单清单导出_佛山_'+strToday+'.csv'), engine='python'))
+    df1=pd.DataFrame(pd.read_csv(os.path.join(today_output_folder_path,'隔夜存量在途退单清单导出_佛山_'+strToday+'.csv'), engine='python',encoding='gbk'))
     #df1.工单号=df1.工单号.apply(lambda x:x[1:]).astype('str')
     df1['区域']=df1['区域'].map(lambda x: str(x)[:-1])
 
-    df2=pd.DataFrame(pd.read_csv(os.path.join(today_output_folder_path,'家客在途单_佛山_'+strYesterday+'.csv'), engine='python'))
+    df2=pd.DataFrame(pd.read_csv(os.path.join(today_output_folder_path,'家客在途单_佛山_'+strYesterday+'.csv'), engine='python',encoding='gbk'))
     #df2.工单号=df2.工单号.apply(lambda x:x[1:]).astype('str')
     df2=df2.rename(columns={'区县':'区域'})
     df2['区域']=df2['区域'].map(lambda x: str(x)[:-1])
