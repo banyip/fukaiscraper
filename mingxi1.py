@@ -14,11 +14,11 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5,pdew):
     starttime = datetime.datetime.now()
     
     today_output_folder_path=os.path.join(file_path,strToday)
-    df1=pd.DataFrame(pd.read_csv(os.path.join(today_output_folder_path,'隔夜存量在途退单清单导出_佛山_'+strToday+'.csv'), engine='python',encoding='gbk'))
+    df1=pd.DataFrame(pd.read_csv(os.path.join(today_output_folder_path,'隔夜存量在途退单清单导出_佛山_'+strToday+'.csv'), engine='python'))
     #df1.工单号=df1.工单号.apply(lambda x:x[1:]).astype('str')
     df1['区域']=df1['区域'].map(lambda x: str(x)[:-1])
 
-    df2=pd.DataFrame(pd.read_csv(os.path.join(today_output_folder_path,'家客在途单_佛山_'+strYesterday+'.csv'), engine='python',encoding='gbk'))
+    df2=pd.DataFrame(pd.read_csv(os.path.join(today_output_folder_path,'家客在途单_佛山_'+strYesterday+'.csv'), engine='python'))
     #df2.工单号=df2.工单号.apply(lambda x:x[1:]).astype('str')
     df2=df2.rename(columns={'区县':'区域'})
     df2['区域']=df2['区域'].map(lambda x: str(x)[:-1])
@@ -385,94 +385,38 @@ def mingxi1(file_path,strToday,strYesterday,writer,df5,pdew):
 
     #da2.to_excel(excel_writer=writer,sheet_name='攻坚单量',index=False)       
     pdew.df2Sheet('攻坚单量',da2)       
-        
+
+    dq1=df1[(( df1['操作类型'] =='业务开通')|(df1['操作类型'] =='预勘查'))&(df1['产品名称']=='家客开通')&(df1['派单时间'] >='2020-01-01 00:00:00')&(df1['退单状态'] !='家客退单审批')]
+    dq1.reset_index(drop=True,inplace=True)
+    
+    
+    right=df5.loc[:,['工单号','五级地址ID']]
+    dq1.drop(['五级地址ID'],axis=1,inplace=True)
+    dq1 = pd.merge(dq1,right,on=['工单号'],how='left')
+    
+    right=df6.loc[:,['地址ID','网格']]
+    dq1=pd.merge(dq1,right,left_on='五级地址ID',right_on='地址ID',how='left')
+    dq1.drop(['地址ID'],axis=1,inplace=True)
+    
+    right=df6.loc[:,['用户班名称','网格']]
+    right.rename(columns={'网格':'网格1'},inplace=True)
+    right.drop_duplicates(subset=['用户班名称'],inplace=True)
+    right.reset_index(drop=True,inplace=True)
+    dq1=pd.merge(dq1,right,left_on='装维组名称',right_on='用户班名称',how='left')
+    dq1['网格']=dq1.apply(getCell,axis=1)
+    
+        #调整列顺序
+    dq1_f=dq1.网格
+    dq1.drop(['五级地址ID','网格','用户班名称','网格1'],axis=1,inplace=True)
+    dq1.insert(7,'网格',dq1_f)
+
+    pdew.df2Sheet('待退单在途数',dq1)      
 
     now_time = time.strftime('%Y-%m-%d',time.localtime(time.time()))+' 00:00:00' #今天的日期凌晨
     now=datetime.datetime.now()
     dayOfWeek = datetime.datetime.now().isoweekday() 
     days=datetime.timedelta(days=dayOfWeek-1) 
     oneday=(now-days).strftime("%Y-%m-%d")  +' 00:00:00' #周一凌晨
-
-    #时间修改为整个月在
-    da3=df1[(( df1['操作类型'] =='业务开通')|(df1['操作类型'] =='预勘查'))&(df1['产品名称']=='家客开通')&(df1['退单状态'] !='家客退单审批')&(df1['退单状态'] !='部分退单审批')&(df1['派单时间'] >= '2021-01-01')&(df1['派单时间'] < '2021-01-31' )]
-    da3.reset_index(drop=True,inplace=True)
-    #da3=da3.drop(['七级地址'],axis=1)
-
-    '''需要优化
-    left=da3.loc[:,['工单号']]
-    right=df5.loc[:,['工单号','五级地址ID','五级地址名称']]
-    pin=pd.merge(left,right,left_on='工单号',right_on='工单号',how='inner')
-    for i in range(len(pin)):
-        da3.loc[i,'五级地址']=pin.loc[i,'五级地址ID']
-        if pd.isnull(da3.loc[i,'五级地址名称'])==True:     
-        da3.loc[i,'五级地址名称']=pin.loc[i,'五级地址名称']
-        
-    left=da3.loc[:,['五级地址']]       
-    right=df6.loc[:,['地址ID','网格']]
-    pin=pd.merge(left,right,left_on='五级地址',right_on='地址ID',how='inner')
-    for i in range(len(da3)):
-        for j in range(len(pin)):
-            if da3.loc[i,'五级地址']==pin.loc[j,'地址ID']:
-            da3.loc[i,'网格']=pin.loc[j,'网格']
-            else:
-                continue
-
-    left=da3.loc[:,['装维组名称']]       
-    right=df6.loc[:,['用户班名称','网格']]
-    pin=pd.merge(left,right,left_on='装维组名称',right_on='用户班名称',how='inner')
-    for i in range(len(da3)):
-        for j in range(len(pin)):
-            if (pd.isnull(da3.loc[i,'网格'])==True)&(da3.loc[i,'装维组名称']==pin.loc[j,'用户班名称']):
-            da3.loc[i,'网格']=pin.loc[j,'网格']
-            else:
-                continue        
-    '''
-
-    #替换为
-    right=df5.loc[:,['工单号','五级地址ID','标准地址','五级地址名称']]
-    right.rename(columns={'五级地址名称':'五级地址名称1'},inplace=True) 
-    da3.drop(['五级地址ID'],axis=1,inplace=True)
-    da3 = pd.merge(da3,right,on=['工单号'],how='left')
-    da3.rename(columns={'五级地址ID':'五级地址','标准地址':'七级地址'},inplace=True) 
-    da3['五级地址名称']=da3.apply(get5AddressName,axis=1)
-    da3.drop(['五级地址名称1'],axis=1,inplace=True)
-
-
-    right=df6.loc[:,['地址ID','网格']]
-    da3=pd.merge(da3,right,left_on='五级地址',right_on='地址ID',how='left')
-    da3.drop(['地址ID'],axis=1,inplace=True)
-
-
-    right=df6.loc[:,['用户班名称','网格']]
-    right.rename(columns={'网格':'网格1'},inplace=True)
-    right.drop_duplicates(subset=['用户班名称'],inplace=True)
-    right.reset_index(drop=True,inplace=True)
-    da3=pd.merge(da3,right,left_on='装维组名称',right_on='用户班名称',how='left')
-    da3['网格']=da3.apply(getCell,axis=1)
-
-    #调整列顺序
-    da3_f=da3.五级地址
-    da3_s=da3.网格
-    da3_t=da3.七级地址
-    da3.drop(['五级地址','网格','七级地址','用户班名称','网格1'],axis=1,inplace=True)
-    da3.insert(7,'五级地址',da3_f)
-    da3.insert(8,'网格',da3_s)
-    da3.insert(9,'七级地址',da3_t)
-    #替换结束
-    for i in range(len(da3)):
-        if (pd.isnull(da3.loc[i,'区域'])):
-            da3.loc[i,'区域']=da3.loc[i,'七级地址'][3:5]
-        else:
-            continue
-        
-    for i in range(len(da3)):
-        if (pd.isnull(da3.loc[i,'网格'])):
-            da3.loc[i,'网格']=da3.loc[i,'七级地址'][8:10]
-        else:
-            continue
-
-    #da3.to_excel(excel_writer=writer,sheet_name='退单在途工单', index=False)      
-    pdew.df2Sheet('退单在途工单',da3)   
 
         
     #col_name = df2.columns.tolist()          # 将数据框的列名全部提取出来存放在列表里

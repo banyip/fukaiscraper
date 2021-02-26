@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support.select import Select
 from captcha import VerificationCode
+from sqlalchemy import create_engine
 import time
 import datetime
 import os
@@ -145,7 +146,7 @@ def sfDuiXianLv(drive,strTime):
 
         textinput = drive.find_element_by_id('actions')
         textinput.click()
-        textinput.send_keys('业务开通')
+        textinput.send_keys('开通+移机')
         textinput = drive.find_element_by_id('serviceType')
         textinput.click()
         textinput.send_keys('家客开通')
@@ -574,7 +575,9 @@ def sfBeiZengDataExport(output_folder_path,_signal=None):
             #writer.close()
             
             pdew.saveWorkbook(os.path.join(today_output_folder_path,'当月指标'+yesterday_strTime[5:]+'.xlsx'))
-
+            print('已生成当月指标，服开数据更新入库')
+            #engine==create_engine('mysql+pymysql://root:kx123456@192.168.100.231/zhibiao')            
+            
         endtime = datetime.datetime.now()
         duringtime = endtime -  starttime
         print("all for" +str(duringtime.seconds)+'seconds')
